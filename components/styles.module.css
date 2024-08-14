@@ -213,3 +213,22 @@
 .hidden {
   visibility: hidden;
 }
+
+.calendarSection {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.calendarSection h2 {
+  margin-bottom: 1rem;
+}
+
+.calendarSection iframe {
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
