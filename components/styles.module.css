@@ -219,10 +219,7 @@
   padding: 1rem;
   background-color: #f9f9f9;
   border-radius: 8px;
-}
-
-.calendarSection h2 {
-  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .calendarSection iframe {
