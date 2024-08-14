@@ -285,6 +285,19 @@ export const NotionPage: React.FC<types.PageProps> = ({
         pageAside={pageAside}
         footer={footer}
       />
+
+      {/* New Calendar Section */}
+      <div className={styles.calendarSection}>
+        <h2>Calendar</h2>
+        <iframe 
+          src="https://calendar.google.com/calendar/embed?src=hanqizenghannanana%40gmail.com&ctz=America%2FToronto" 
+          style={{border: 0}} 
+          width="800" 
+          height="600" 
+          frameBorder="0" 
+          scrolling="no">
+        </iframe>
+      </div>
     </>
   )
 }
