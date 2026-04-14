@@ -2,11 +2,6 @@
   "root": true,
   "extends": ["@fisch0920/eslint-config"],
   "rules": {
-<<<<<<< HEAD
-    "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/no-non-null-assertion": 0,
-    "react/prop-types": 0
-=======
     "react/prop-types": "off",
     "unicorn/no-array-reduce": "off",
     "unicorn/filename-case": "off",
@@ -18,6 +13,5 @@
     "jsx-a11y/interactive-supports-focus": "off",
     "jsx-a11y/anchor-is-valid": "off",
     "@typescript-eslint/naming-convention": "off"
->>>>>>> upstream/main
   }
 }

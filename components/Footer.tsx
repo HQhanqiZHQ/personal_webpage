@@ -29,15 +29,9 @@ export function FooterImpl() {
 
   return (
     <footer className={styles.footer}>
-<<<<<<< HEAD
       <div className={styles.copyright}>Copyright {new Date().getFullYear()} {config.author}</div>
       <div style={{display: "none"}}>陈攀bb我爱你😘</div>
       {/* 陈攀bb我爱你😘 */}
-=======
-      <div className={styles.copyright}>
-        Copyright {currentYear} {config.author}
-      </div>
->>>>>>> upstream/main
 
       <div className={styles.settings}>
         {hasMounted && (
