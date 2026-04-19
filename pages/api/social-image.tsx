@@ -1,19 +1,8 @@
-import ky from 'ky'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 import { ImageResponse } from 'next/og'
 import { type PageBlock } from 'notion-types'
-import {
-  getBlockIcon,
-  getBlockTitle,
-  getBlockValue,
-  getPageProperty,
-  isUrl,
-  parsePageId
-} from 'notion-utils'
 
 import * as libConfig from '@/lib/config'
-import interSemiBoldFont from '@/lib/fonts/inter-semibold'
-import { mapImageUrl } from '@/lib/map-image-url'
 import { notion } from '@/lib/notion-api'
 import { type NotionPageInfo, type PageError } from '@/lib/types'
 
@@ -112,7 +101,7 @@ export default async function OGImage(
             style={{
               fontSize: 70,
               fontWeight: 700,
-              fontFamily: 'Inter'
+              fontFamily: 'system-ui, sans-serif'
             }}
           >
             {pageInfo.title}
@@ -151,15 +140,7 @@ export default async function OGImage(
     </div>,
     {
       width: 1200,
-      height: 630,
-      fonts: [
-        {
-          name: 'Inter',
-          data: interSemiBoldFont,
-          style: 'normal',
-          weight: 700
-        }
-      ]
+      height: 630
     }
   )
 }
@@ -199,7 +180,7 @@ export async function getNotionPageInfo({
 
   const isBlogPost =
     block.type === 'page' && block.parent_table === 'collection'
-  const title = getBlockTitle(block, recordMap) || libConfig.name
+  const title = getBlockTitle(block) || libConfig.name
 
   const imageCoverPosition =
     (block as PageBlock).format?.page_cover_position ??
@@ -208,26 +189,21 @@ export async function getNotionPageInfo({
     ? `center ${(1 - imageCoverPosition) * 100}%`
     : undefined
 
-  const imageBlockUrl = mapImageUrl(
-    getPageProperty<string>('Social Image', block, recordMap) ||
-      (block as PageBlock).format?.page_cover,
-    block
-  )
-  const imageFallbackUrl = mapImageUrl(libConfig.defaultPageCover, block)
+  const imageBlockUrl =
+    getPageProperty<string>('Social Image', block) ||
+    (block as PageBlock).format?.page_cover
+  const imageFallbackUrl = libConfig.defaultPageCover ?? undefined
 
-  const blockIcon = getBlockIcon(block, recordMap)
-  const authorImageBlockUrl = mapImageUrl(
-    blockIcon && isUrl(blockIcon) ? blockIcon : undefined,
-    block
-  )
-  const authorImageFallbackUrl = mapImageUrl(libConfig.defaultPageIcon, block)
+  const blockIcon = getBlockIcon(block)
+  const authorImageBlockUrl =
+    blockIcon && isUrl(blockIcon) ? blockIcon : undefined
+  const authorImageFallbackUrl = libConfig.defaultPageIcon ?? undefined
   const [authorImage, image] = await Promise.all([
     getCompatibleImageUrl(authorImageBlockUrl, authorImageFallbackUrl),
     getCompatibleImageUrl(imageBlockUrl, imageFallbackUrl)
   ])
 
-  const author =
-    getPageProperty<string>('Author', block, recordMap) || libConfig.author
+  const author = getPageProperty<string>('Author', block) || libConfig.author
 
   // const socialDescription =
   //   getPageProperty<string>('Description', block, recordMap) ||
@@ -238,7 +214,7 @@ export async function getNotionPageInfo({
   //   block,
   //   recordMap
   // )
-  const publishedTime = getPageProperty<number>('Published', block, recordMap)
+  const publishedTime = getPageProperty<number>('Published', block)
   const datePublished = publishedTime ? new Date(publishedTime) : undefined
   // const dateUpdated = lastUpdatedTime
   //   ? new Date(lastUpdatedTime)
@@ -277,11 +253,54 @@ async function isUrlReachable(
   }
 
   try {
-    await ky.head(url)
-    return true
+    const response = await fetch(url, { method: 'HEAD' })
+    return response.ok
   } catch {
     return false
   }
+}
+
+function parsePageId(pageId?: string | null): string | null {
+  if (!pageId) {
+    return null
+  }
+
+  const cleaned = pageId.replace(/[^0-9a-fA-F]/g, '')
+  if (cleaned.length !== 32) {
+    return null
+  }
+
+  return cleaned.replace(
+    /^(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})$/,
+    '$1-$2-$3-$4-$5'
+  )
+}
+
+function getBlockValue(block: any) {
+  return block?.value ?? block
+}
+
+function getBlockTitle(block: any): string | undefined {
+  const value = getBlockValue(block)
+  return value?.properties?.title?.[0]?.[0] ?? value?.properties?.Name?.[0]?.[0]
+}
+
+function getPageProperty<T>(propertyName: string, block: any): T | undefined {
+  const value = getBlockValue(block)
+  const property = value?.properties?.[propertyName]
+  return Array.isArray(property) ? (property[0]?.[0] as T) : undefined
+}
+
+function getBlockIcon(block: any): string | undefined {
+  const value = getBlockValue(block)
+  return value?.format?.page_icon ?? value?.properties?.icon?.[0]?.[0]
+}
+
+function isUrl(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^(https?:)?\/\//.test(value)
+  )
 }
 
 async function getCompatibleImageUrl(
