@@ -33,7 +33,7 @@ const getNavigationLinkPages = pMemoize(
             signFileUrls: false
           }),
         {
-          concurrency: 4
+          concurrency: 1
         }
       )
     }
@@ -43,7 +43,13 @@ const getNavigationLinkPages = pMemoize(
 )
 
 export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
+  // Add delay to avoid rate limiting
+  await new Promise(resolve => setTimeout(resolve, 5000))
+
   let recordMap = await notion.getPage(pageId)
+
+  // Add delay to avoid rate limiting
+  await new Promise(resolve => setTimeout(resolve, 5000))
 
   if (navigationStyle !== 'default') {
     // ensure that any pages linked to in the custom navigation header have
