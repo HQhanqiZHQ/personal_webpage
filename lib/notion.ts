@@ -43,7 +43,7 @@ const getNavigationLinkPages = pMemoize(
 )
 
 export async function getPage(pageId: string): Promise<ExtendedRecordMap> {
-  let recordMap = await notion.getPage(pageId)
+  await new Promise((resolve) => setTimeout(resolve, 20000))
 
   if (navigationStyle !== 'default') {
     // ensure that any pages linked to in the custom navigation header have

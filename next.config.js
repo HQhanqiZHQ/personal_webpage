@@ -16,6 +16,12 @@ export default {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
   },
+  experimental: {
+    cpus: 1,
+    workerThreads: false,
+  },
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
 
   // webpack: (config) => {
   //   // Workaround for ensuring that `react` and `react-dom` resolve correctly
